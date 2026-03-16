@@ -503,7 +503,7 @@
 
   function shareResults() {
     const guessIcons = state.guesses.map(g => g.correct ? '\u{1F7E9}' : '\u{1F7E5}').join('');
-    const text = `Tunnel Vision ${today}\n${state.guesses.length} guesses\n${guessIcons}\nhttps://aleitner.github.io/guess-the-card/`;
+    const text = `[Tunnel Vision](https://aleitner.github.io/guess-the-card/) ${guessIcons} ||${cardData.name}||`;
 
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
