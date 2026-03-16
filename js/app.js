@@ -502,8 +502,7 @@
 
 
   function shareResults() {
-    const guessIcons = state.guesses.map(g => g.correct ? '\u{1F7E9}' : '\u{1F7E5}').join('');
-    const text = `[Tunnel Vision](https://aleitner.github.io/guess-the-card/) ${guessIcons} ||${cardData.name}||`;
+    const text = `[Tunnel Vision](https://aleitner.github.io/guess-the-card/) Guessed in ${state.guesses.length} ||${cardData.name}||`;
 
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
