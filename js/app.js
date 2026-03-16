@@ -502,7 +502,7 @@
 
 
   function shareResults() {
-    const text = `[Tunnel Vision](https://aleitner.github.io/guess-the-card/) Guessed in ${state.guesses.length} ||${cardData.name}||`;
+    const text = `[Tunnel Vision](https://aleitner.github.io/guess-the-card/) Guessed in ${state.guesses.length}`;
 
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {
