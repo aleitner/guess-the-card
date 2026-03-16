@@ -45,8 +45,12 @@ function parseQuery(input) {
   match = input.match(/^(?:c|color|colors)(>=|<=|!=|>|<|=)(\d+)$/);
   if (match) return { type: 'colorcount', comparator: match[1], value: parseInt(match[2]), negated };
 
-  // Color: c:red, c=r, c=red (treat = with non-numeric as color query)
-  match = input.match(/^(?:c|color|colors)[:=](.+)$/);
+  // Exact color: c=r (only red), c=rg (exactly red+green)
+  match = input.match(/^(?:c|color|colors)=([a-z]+)$/);
+  if (match) return { type: 'colorexact', value: match[1].trim(), negated };
+
+  // Color includes: c:red, c:r (has red, possibly more)
+  match = input.match(/^(?:c|color|colors):(.+)$/);
   if (match) return { type: 'color', value: match[1].trim(), negated };
 
   // Type
@@ -121,6 +125,7 @@ function evaluateGuess(query, card) {
   switch (query.type) {
     case 'name': return evaluateName(query, card);
     case 'color': result = evaluateColor(query, card); break;
+    case 'colorexact': result = evaluateColorExact(query, card); break;
     case 'colorcount': result = evaluateColorCount(query, card); break;
     case 'identity': result = evaluateIdentity(query, card); break;
     case 'type': result = evaluateType(query, card); break;
@@ -187,6 +192,31 @@ function evaluateColor(query, card) {
   }
 
   // Color guess reveals the card border color but NOT the mana cost symbols
+  return { correct, category: 'color', hint, reveals: correct ? 'color' : null };
+}
+
+
+function evaluateColorExact(query, card) {
+  const val = query.value.toLowerCase().trim();
+  const cardColors = (card.colors || []).sort();
+
+  // Parse input: "r" -> ["R"], "rg" -> ["G","R"], "colorless" -> []
+  let targetColors;
+  if (val === 'colorless' || val === 'c') {
+    targetColors = [];
+  } else {
+    // Each character maps to a color code
+    targetColors = val.split('').map(ch => {
+      return COLOR_MAP[ch] || ch.toUpperCase();
+    }).sort();
+  }
+
+  const correct = JSON.stringify(cardColors) === JSON.stringify(targetColors);
+  const targetName = targetColors.length === 0
+    ? 'colorless'
+    : targetColors.map(c => COLOR_NAMES[c] || c).join('+');
+  const hint = correct ? `Exactly ${targetName}` : `Not exactly ${targetName}`;
+
   return { correct, category: 'color', hint, reveals: correct ? 'color' : null };
 }
 
