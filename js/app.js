@@ -63,16 +63,6 @@
     showWinState();
   }
 
-  // Debug reset
-  document.getElementById('debug-btn').addEventListener('click', () => {
-    if (confirm('Clear all Tunnel Vision data and reload?')) {
-      Object.keys(localStorage)
-        .filter(k => k.startsWith('tunnel-vision'))
-        .forEach(k => localStorage.removeItem(k));
-      location.reload();
-    }
-  });
-
   // Help modal
   helpBtn.addEventListener('click', () => helpModal.classList.add('active'));
   helpClose.addEventListener('click', () => helpModal.classList.remove('active'));

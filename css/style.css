@@ -78,9 +78,6 @@ header h1 a:hover {
   color: var(--blue-frame);
 }
 
-.debug-btn {
-  right: 3.5rem;
-}
 
 /* Layout */
 main {
