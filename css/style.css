@@ -1,0 +1,566 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #0d1a33;
+  --text: #d4dce8;
+  --text-muted: #6b7fa0;
+  --accent: #3b82d4;
+  --correct: #4caf50;
+  --wrong: #c0392b;
+  --slot-border: #2a4a7a;
+  --slot-bg: rgba(14, 104, 171, 0.06);
+  --card-border: #1a5a9e;
+  --input-bg: #0c1e3d;
+  --blue-frame: #0e68ab;
+  --blue-dark: #0a1628;
+  --gold: #c9a82a;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(14, 104, 171, 0.15) 0%, transparent 70%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* Header */
+header {
+  text-align: center;
+  padding: 1rem;
+  position: relative;
+  border-bottom: 1px solid #1a3a6a;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  letter-spacing: 0.08em;
+  color: #fff;
+}
+
+header h1 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+header h1 a:hover {
+  color: var(--blue-frame);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.icon-btn {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 2px solid var(--text-muted);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.icon-btn:hover {
+  border-color: var(--blue-frame);
+  color: var(--blue-frame);
+}
+
+.debug-btn {
+  right: 3.5rem;
+}
+
+/* Layout */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.game-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.card-area {
+  flex: 0 0 300px;
+  max-width: 100%;
+}
+
+.guess-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.guess-area h2 {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Card Outline */
+.card-outline {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 488 / 680;
+  border: 3px dashed var(--card-border);
+  border-radius: 16px;
+  background: var(--bg-card);
+  transition: border-color 0.5s, border-style 0.5s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-outline.revealed {
+  border: 3px solid var(--card-border);
+}
+
+/* Full card image overlay - hidden until win */
+.card-overlay-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 13px;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.card-overlay-img.visible {
+  opacity: 1;
+}
+
+/* Slots container */
+.card-slots {
+  position: relative;
+  z-index: 2;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  transition: opacity 0.8s ease;
+  overflow: hidden;
+}
+
+.card-slots.faded {
+  opacity: 0;
+}
+
+.slot {
+  border: 2px dashed var(--slot-border);
+  border-radius: 6px;
+  padding: 6px;
+  background: var(--slot-bg);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+  transition: all 0.4s ease;
+  position: relative;
+  min-height: 0;
+}
+
+.slot.revealed {
+  border-style: solid;
+  border-color: var(--correct);
+  color: var(--text);
+  background: rgba(76, 175, 80, 0.08);
+  animation: slot-reveal 0.5s ease;
+}
+
+/* Redacted text styling */
+.slot.redacted {
+  border-color: var(--gold);
+  color: var(--text);
+  background: rgba(201, 168, 42, 0.06);
+  letter-spacing: 0.05em;
+}
+
+/* Constraint display in slots */
+.slot-constraint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+@keyframes slot-reveal {
+  0% { transform: scale(1.05); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Card sections */
+.card-header {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.card-name {
+  flex: 1;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.card-mana-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 0 0 auto;
+  min-width: 60px;
+}
+
+.card-mana {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.card-cmc {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+}
+
+/* Scryfall mana symbol images */
+.mana-symbol {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+.card-art {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.art-placeholder {
+  font-size: 2rem;
+  color: var(--slot-border);
+}
+
+.card-midbar {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.card-typeline {
+  flex: 1;
+  font-style: italic;
+}
+
+.card-rarity {
+  flex: 0 0 auto;
+  min-width: 50px;
+  font-size: 0.8rem;
+}
+
+.card-textbox {
+  flex: 1 1 0;
+  min-height: 0;
+  font-size: 0.75rem;
+  text-align: left;
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+
+.card-footer {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.card-artist {
+  flex: 1;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+.card-pt {
+  flex: 0 0 60px;
+  font-weight: bold;
+}
+
+/* Guess List */
+.guess-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.guess-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid #1a3a6a;
+  font-size: 0.9rem;
+  animation: slide-in 0.3s ease;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.guess-icon {
+  font-size: 1.2rem;
+  flex: 0 0 24px;
+  text-align: center;
+}
+
+.guess-icon.correct { color: var(--correct); }
+.guess-icon.wrong { color: var(--wrong); }
+
+.guess-query {
+  flex: 1;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.guess-hint {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* Input */
+.input-area {
+  position: sticky;
+  bottom: 0;
+  background: var(--bg);
+  padding: 1rem 0;
+  border-top: 1px solid #1a3a6a;
+}
+
+#guess-form {
+  display: flex;
+  gap: 8px;
+}
+
+#guess-input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 2px solid var(--slot-border);
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: 'Consolas', 'Monaco', monospace;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#guess-input:focus {
+  border-color: var(--blue-frame);
+}
+
+#guess-form button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  background: var(--blue-frame);
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#guess-form button:hover {
+  background: #0c5a96;
+}
+
+#guess-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  min-height: 1.2em;
+}
+
+.input-hint.error {
+  color: var(--wrong);
+}
+
+/* Mill animation - cards peel off the card outline */
+.mill-card {
+  position: fixed;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1a0a3e, #2a1a5e);
+  border: 3px solid #4a3a8a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0;
+  animation: mill-fly var(--mill-duration, 0.6s) ease-in forwards;
+  animation-delay: var(--mill-delay, 0s);
+}
+
+.mill-card-back-pattern {
+  width: 80%;
+  height: 80%;
+  border-radius: 6px;
+  border: 2px solid #5a4a9a;
+  background: radial-gradient(ellipse, #2a1a5e, #1a0a3e);
+}
+
+@keyframes mill-fly {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+  60% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--mill-x, 100px), 300px) rotate(var(--mill-rotate, 15deg)) scale(0.7); }
+}
+
+/* Modals */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid #1a3a6a;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  right: 1rem;
+  top: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal h2 {
+  margin-bottom: 1rem;
+}
+
+.syntax-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}
+
+.syntax-table th,
+.syntax-table td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid #1a3a6a;
+}
+
+.syntax-table code {
+  background: rgba(14, 104, 171, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  color: #7ab8e8;
+}
+
+.win-modal {
+  text-align: center;
+}
+
+.share-btn {
+  padding: 12px 32px;
+  border-radius: 8px;
+  border: none;
+  background: var(--blue-frame);
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.share-btn:hover {
+  opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .game-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card-area {
+    flex: none;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .card-outline {
+    max-width: 280px;
+  }
+
+  .guess-area {
+    width: 100%;
+  }
+
+  .guess-list {
+    max-height: 40vh;
+  }
+
+  .mill-card {
+    width: 100px;
+    height: 140px;
+    font-size: 2rem;
+  }
+
+  .mill-reveal-card {
+    width: 180px;
+  }
+}
