@@ -45,8 +45,8 @@ function parseQuery(input) {
   match = input.match(/^(?:c|color|colors)(>=|<=|!=|>|<|=)(\d+)$/);
   if (match) return { type: 'colorcount', comparator: match[1], value: parseInt(match[2]), negated };
 
-  // Color
-  match = input.match(/^(?:c|color|colors):(.+)$/);
+  // Color: c:red, c=r, c=red (treat = with non-numeric as color query)
+  match = input.match(/^(?:c|color|colors)[:=](.+)$/);
   if (match) return { type: 'color', value: match[1].trim(), negated };
 
   // Type
