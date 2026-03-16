@@ -66,6 +66,17 @@
 
   </main>
 
+  <footer>
+    <div class="footer-links">
+      <a href="https://aleitner.github.io/symbol-status/" target="_blank" rel="noopener">Symbol Status</a>
+      <a id="reframe-link" style="display:none" target="_blank" rel="noopener">Reframe MTG</a>
+      <span class="footer-sep">|</span>
+      <a href="https://arcbond.io/" target="_blank" rel="noopener">Arcbond</a>
+      <span class="footer-sep">|</span>
+      <a href="https://ko-fi.com/piyrus" target="_blank" rel="noopener">Ko-fi</a>
+    </div>
+  </footer>
+
   <div class="modal-overlay" id="help-modal">
     <div class="modal">
       <button class="modal-close" id="help-close">&times;</button>
@@ -100,6 +111,26 @@
     </div>
   </div>
 
+  <script>
+    (function() {
+      var link = document.getElementById('reframe-link');
+      var ua = navigator.userAgent;
+      var href = null;
+      if (/Firefox\//.test(ua)) {
+        href = 'https://addons.mozilla.org/en-US/firefox/addon/reframe-mtg/';
+      } else if (/Chrome\//.test(ua) || /Edg\//.test(ua) || /OPR\//.test(ua)) {
+        href = 'https://chromewebstore.google.com/detail/reframe-mtg/miphiffdfmjpiohgaabmdpppdobjgohj';
+      }
+      if (href) {
+        link.href = href;
+        link.style.display = '';
+        var sep = document.createElement('span');
+        sep.className = 'footer-sep';
+        sep.textContent = '|';
+        link.parentNode.insertBefore(sep, link);
+      }
+    })();
+  </script>
   <script src="js/card-pool.js"></script>
   <script src="js/daily-card.js"></script>
   <script src="js/query-parser.js"></script>

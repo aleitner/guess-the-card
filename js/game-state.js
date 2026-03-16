@@ -35,27 +35,3 @@ function createFreshState() {
   };
 }
 
-function loadStats() {
-  const stored = localStorage.getItem('tunnel-vision-stats');
-  if (!stored) {
-    return { gamesPlayed: 0, gamesWon: 0, currentStreak: 0, maxStreak: 0 };
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return { gamesPlayed: 0, gamesWon: 0, currentStreak: 0, maxStreak: 0 };
-  }
-}
-
-function saveStats(stats) {
-  localStorage.setItem('tunnel-vision-stats', JSON.stringify(stats));
-}
-
-function recordWin() {
-  const stats = loadStats();
-  stats.gamesPlayed++;
-  stats.gamesWon++;
-  stats.currentStreak++;
-  stats.maxStreak = Math.max(stats.maxStreak, stats.currentStreak);
-  saveStats(stats);
-}

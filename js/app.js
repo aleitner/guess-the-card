@@ -149,8 +149,7 @@
       // Hide the entire card outline so nothing shows behind mill cards
       playMillAnimation(() => {
         revealAll();
-        // Let the player see the revealed card before showing the modal
-        setTimeout(() => showWinState(), 1500);
+        showWinState();
       });
     } else {
       saveGameState(today, state);
@@ -514,7 +513,7 @@
 
   function shareResults() {
     const guessIcons = state.guesses.map(g => g.correct ? '\u{1F7E9}' : '\u{1F7E5}').join('');
-    const text = `Tunnel Vision ${today}\n${state.guesses.length} guesses\n${guessIcons}`;
+    const text = `Tunnel Vision ${today}\n${state.guesses.length} guesses\n${guessIcons}\nhttps://aleitner.github.io/guess-the-card/`;
 
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(() => {

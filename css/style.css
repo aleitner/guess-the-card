@@ -564,3 +564,30 @@ main {
     width: 180px;
   }
 }
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-top: 1px solid #1a3a6a;
+  margin-top: 2rem;
+}
+
+.footer-links {
+  font-size: 0.8rem;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--blue-frame);
+}
+
+.footer-sep {
+  color: #1a3a6a;
+  margin: 0 0.4rem;
+}
