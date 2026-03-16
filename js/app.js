@@ -295,7 +295,10 @@
         // Type is handled by redaction — just mark as having matches
         break;
       case 'pt':
-        if (cardData.power !== undefined) {
+        if (cardData.loyalty) {
+          slotPt.textContent = `Loyalty: ${cardData.loyalty}`;
+          slotPt.classList.add('revealed');
+        } else if (cardData.power !== undefined) {
           slotPt.textContent = `${cardData.power}/${cardData.toughness}`;
           slotPt.classList.add('revealed');
         }
@@ -335,7 +338,10 @@
     slotRarity.textContent = capitalize(cardData.rarity || 'N/A');
     slotRarity.classList.add('revealed');
 
-    if (cardData.power !== undefined) {
+    if (cardData.loyalty) {
+      slotPt.textContent = `Loyalty: ${cardData.loyalty}`;
+      slotPt.classList.add('revealed');
+    } else if (cardData.power !== undefined) {
       slotPt.textContent = `${cardData.power}/${cardData.toughness}`;
       slotPt.classList.add('revealed');
     }

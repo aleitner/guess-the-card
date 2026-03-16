@@ -83,17 +83,24 @@
       <p>Guess today's Magic: The Gathering card using Scryfall-style syntax!</p>
       <table class="syntax-table">
         <tr><th>Syntax</th><th>What it checks</th><th>Example</th></tr>
-        <tr><td><code>c:</code></td><td>Color</td><td><code>c:red</code>, <code>c:multicolor</code></td></tr>
+        <tr><td><code>c:</code></td><td>Color</td><td><code>c:red</code>, <code>c:r</code>, <code>c:multicolor</code>, <code>c:colorless</code></td></tr>
+        <tr><td><code>c=</code></td><td>Color count</td><td><code>c&gt;1</code>, <code>c=2</code>, <code>c&lt;=1</code></td></tr>
+        <tr><td><code>id:</code></td><td>Color identity</td><td><code>id:r</code>, <code>id:urg</code>, <code>id:colorless</code></td></tr>
         <tr><td><code>cmc=</code></td><td>Mana value (number)</td><td><code>cmc=3</code>, <code>cmc&gt;4</code></td></tr>
         <tr><td><code>m:</code></td><td>Mana pips (exact symbols)</td><td><code>m:{R}</code>, <code>m:{2}{W}</code></td></tr>
         <tr><td><code>t:</code></td><td>Type / Subtype</td><td><code>t:creature</code>, <code>t:goblin</code></td></tr>
         <tr><td><code>pow=</code></td><td>Power</td><td><code>pow=4</code>, <code>pow&gt;=3</code></td></tr>
         <tr><td><code>tou=</code></td><td>Toughness</td><td><code>tou=5</code>, <code>tou&lt;3</code></td></tr>
-        <tr><td><code>r:</code></td><td>Rarity</td><td><code>r:mythic</code>, <code>r:rare</code></td></tr>
+        <tr><td><code>loy=</code></td><td>Loyalty</td><td><code>loy=3</code>, <code>loy&gt;4</code></td></tr>
+        <tr><td><code>r:</code></td><td>Rarity</td><td><code>r:mythic</code>, <code>r:rare</code>, <code>r:uncommon</code>, <code>r:common</code></td></tr>
+        <tr><td><code>s:</code></td><td>Set</td><td><code>s:mh1</code>, <code>s:alpha</code></td></tr>
         <tr><td><code>o:</code></td><td>Oracle text</td><td><code>o:trample</code>, <code>o:draw a card</code></td></tr>
+        <tr><td><code>ft:</code></td><td>Flavor text</td><td><code>ft:doom</code>, <code>ft:jace</code></td></tr>
         <tr><td><code>k:</code></td><td>Keyword</td><td><code>k:flying</code>, <code>k:haste</code></td></tr>
         <tr><td><code>a:</code></td><td>Artist</td><td><code>a:christopher rush</code></td></tr>
-        <tr><td><code>is:</code></td><td>Card tags</td><td><code>is:triggered</code>, <code>is:burn</code>, <code>is:removal</code></td></tr>
+        <tr><td><code>produces:</code></td><td>Mana produced</td><td><code>produces:red</code>, <code>produces:g</code></td></tr>
+        <tr><td><code>is:</code></td><td>Card tags</td><td><code>is:legendary</code>, <code>is:spell</code>, <code>is:vanilla</code></td></tr>
+        <tr><td><code>-</code></td><td>Negate any query</td><td><code>-c:red</code>, <code>-t:creature</code>, <code>-is:burn</code></td></tr>
         <tr><td><code>name:</code></td><td>Guess the name!</td><td><code>name:lightning bolt</code></td></tr>
       </table>
       <p>Each correct attribute guess reveals part of the card. Guess the name to win!</p>

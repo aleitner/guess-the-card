@@ -23,56 +23,91 @@ function parseQuery(input) {
   input = input.trim().toLowerCase();
   if (!input) return null;
 
-  // Name guess: "name:something"
+  // Negation prefix: -c:red, -t:creature, etc.
+  let negated = false;
+  if (input.startsWith('-')) {
+    negated = true;
+    input = input.slice(1);
+  }
+
+  // Name guess: "name:something" (negation doesn't apply)
   if (input.startsWith('name:')) {
     return { type: 'name', value: input.slice(5).trim() };
   }
 
   let match;
 
+  // Color identity: id:urg, identity:wubrg
+  match = input.match(/^(?:id|identity|ci):(.+)$/);
+  if (match) return { type: 'identity', value: match[1].trim(), negated };
+
+  // Color count: c>1, c=2, c<=1, colors>=2
+  match = input.match(/^(?:c|color|colors)(>=|<=|!=|>|<|=)(\d+)$/);
+  if (match) return { type: 'colorcount', comparator: match[1], value: parseInt(match[2]), negated };
+
   // Color
   match = input.match(/^(?:c|color|colors):(.+)$/);
-  if (match) return { type: 'color', value: match[1].trim() };
+  if (match) return { type: 'color', value: match[1].trim(), negated };
 
   // Type
   match = input.match(/^(?:t|type):(.+)$/);
-  if (match) return { type: 'type', value: match[1].trim() };
+  if (match) return { type: 'type', value: match[1].trim(), negated };
 
   // CMC / Mana Value
   match = input.match(/^(?:cmc|mv)(>=|<=|!=|>|<|=)(\d+)$/);
-  if (match) return { type: 'cmc', comparator: match[1], value: parseInt(match[2]) };
+  if (match) return { type: 'cmc', comparator: match[1], value: parseInt(match[2]), negated };
+
+  // Loyalty
+  match = input.match(/^(?:loy|loyalty)(>=|<=|!=|>|<|=)(\d+)$/);
+  if (match) return { type: 'loyalty', comparator: match[1], value: parseInt(match[2]), negated };
 
   // Power
   match = input.match(/^(?:pow|power)(>=|<=|!=|>|<|=)(.+)$/);
-  if (match) return { type: 'power', comparator: match[1], value: match[2].trim() };
+  if (match) return { type: 'power', comparator: match[1], value: match[2].trim(), negated };
 
   // Toughness
   match = input.match(/^(?:tou|toughness)(>=|<=|!=|>|<|=)(.+)$/);
-  if (match) return { type: 'toughness', comparator: match[1], value: match[2].trim() };
+  if (match) return { type: 'toughness', comparator: match[1], value: match[2].trim(), negated };
 
   // Rarity
   match = input.match(/^(?:r|rarity):(.+)$/);
-  if (match) return { type: 'rarity', value: match[1].trim() };
+  if (match) return { type: 'rarity', value: match[1].trim(), negated };
+
+  // Set
+  match = input.match(/^(?:s|e|set|edition):(.+)$/);
+  if (match) return { type: 'set', value: match[1].trim(), negated };
 
   // Mana cost: m:{R}, m:R, m:{2}{R}, mana:{W}{U}
   match = input.match(/^(?:m|mana):(.+)$/);
-  if (match) return { type: 'mana', value: match[1].trim() };
+  if (match) return { type: 'mana', value: match[1].trim(), negated };
+
+  // Produces mana
+  match = input.match(/^(?:produces):(.+)$/);
+  if (match) return { type: 'produces', value: match[1].trim(), negated };
 
   // Oracle text
   match = input.match(/^(?:o|oracle):(.+)$/);
-  if (match) return { type: 'oracle', value: match[1].trim() };
+  if (match) return { type: 'oracle', value: match[1].trim(), negated };
+
+  // Full oracle text (alias for o: in our context)
+  match = input.match(/^(?:fo|fulloracle):(.+)$/);
+  if (match) return { type: 'oracle', value: match[1].trim(), negated };
+
+  // Flavor text
+  match = input.match(/^(?:ft|flavor):(.+)$/);
+  if (match) return { type: 'flavor', value: match[1].trim(), negated };
 
   // Artist
   match = input.match(/^(?:a|artist):(.+)$/);
-  if (match) return { type: 'artist', value: match[1].trim() };
+  if (match) return { type: 'artist', value: match[1].trim(), negated };
 
   // Keywords
   match = input.match(/^(?:k|keyword|keywords):(.+)$/);
-  if (match) return { type: 'keyword', value: match[1].trim() };
+  if (match) return { type: 'keyword', value: match[1].trim(), negated };
 
   // Is/has tags: is:triggered, is:activated, is:modal, etc.
   match = input.match(/^(?:is|has):(.+)$/);
-  if (match) return { type: 'is', value: match[1].trim() };
+  if (match) return { type: 'is', value: match[1].trim(), negated };
 
   // Bare text = name guess
   return { type: 'name', value: input };
@@ -82,21 +117,38 @@ function parseQuery(input) {
 function evaluateGuess(query, card) {
   if (!query) return null;
 
+  let result;
   switch (query.type) {
     case 'name': return evaluateName(query, card);
-    case 'color': return evaluateColor(query, card);
-    case 'type': return evaluateType(query, card);
-    case 'mana': return evaluateMana(query, card);
-    case 'cmc': return evaluateCmc(query, card);
-    case 'power': return evaluatePower(query, card);
-    case 'toughness': return evaluateToughness(query, card);
-    case 'rarity': return evaluateRarity(query, card);
-    case 'oracle': return evaluateOracle(query, card);
-    case 'keyword': return evaluateKeyword(query, card);
-    case 'artist': return evaluateArtist(query, card);
-    case 'is': return evaluateIs(query, card);
+    case 'color': result = evaluateColor(query, card); break;
+    case 'colorcount': result = evaluateColorCount(query, card); break;
+    case 'identity': result = evaluateIdentity(query, card); break;
+    case 'type': result = evaluateType(query, card); break;
+    case 'mana': result = evaluateMana(query, card); break;
+    case 'cmc': result = evaluateCmc(query, card); break;
+    case 'loyalty': result = evaluateLoyalty(query, card); break;
+    case 'power': result = evaluatePower(query, card); break;
+    case 'toughness': result = evaluateToughness(query, card); break;
+    case 'rarity': result = evaluateRarity(query, card); break;
+    case 'set': result = evaluateSet(query, card); break;
+    case 'oracle': result = evaluateOracle(query, card); break;
+    case 'flavor': result = evaluateFlavor(query, card); break;
+    case 'produces': result = evaluateProduces(query, card); break;
+    case 'keyword': result = evaluateKeyword(query, card); break;
+    case 'artist': result = evaluateArtist(query, card); break;
+    case 'is': result = evaluateIs(query, card); break;
     default: return { correct: false, category: 'unknown', hint: 'Unknown query type' };
   }
+
+  // Apply negation: flip correct/incorrect, suppress reveals
+  if (query.negated) {
+    result.correct = !result.correct;
+    result.hint = result.hint;
+    result.reveals = null; // negated guesses never reveal slots
+    result.constraint = null;
+  }
+
+  return result;
 }
 
 
@@ -135,6 +187,25 @@ function evaluateColor(query, card) {
   }
 
   // Color guess reveals the card border color but NOT the mana cost symbols
+  return { correct, category: 'color', hint, reveals: correct ? 'color' : null };
+}
+
+
+function evaluateColorCount(query, card) {
+  const cardCount = (card.colors || []).length;
+  const comp = query.comparator;
+  const val = query.value;
+  const correct = compareNumeric(cardCount, comp, val);
+
+  let hint = '';
+  if (correct) {
+    hint = `${cardCount} color${cardCount !== 1 ? 's' : ''}`;
+  } else if (comp === '=') {
+    hint = `Not ${val} colors`;
+  } else {
+    hint = getConstraintHint('Colors', cardCount, comp, val);
+  }
+
   return { correct, category: 'color', hint, reveals: correct ? 'color' : null };
 }
 
@@ -288,6 +359,105 @@ function evaluateToughness(query, card) {
   return {
     correct, category: 'toughness', hint, reveals: correct ? 'pt' : null,
     constraint: correct ? null : { field: 'tou', comparator: comp, value: guessVal, cardValue: cardVal },
+  };
+}
+
+
+function evaluateIdentity(query, card) {
+  const val = query.value.toLowerCase().trim();
+  const cardIdentity = (card.color_identity || []);
+
+  let correct = false;
+  let hint = '';
+
+  if (val === 'colorless' || val === 'c') {
+    correct = cardIdentity.length === 0;
+    hint = correct ? 'Colorless identity' : 'Not colorless identity';
+  } else {
+    const colorCode = COLOR_MAP[val] || val.toUpperCase();
+    correct = cardIdentity.includes(colorCode);
+    const colorName = COLOR_NAMES[colorCode] || val;
+    hint = correct ? `${colorName} in identity` : `${colorName} not in identity`;
+  }
+
+  return { correct, category: 'identity', hint, reveals: null };
+}
+
+
+function evaluateLoyalty(query, card) {
+  if (!card.loyalty) {
+    return { correct: false, category: 'loyalty', hint: `Not ${query.value}`, reveals: null };
+  }
+  const cardVal = parseInt(card.loyalty);
+  const guessVal = query.value;
+  const comp = query.comparator;
+  if (isNaN(cardVal)) {
+    return { correct: false, category: 'loyalty', hint: 'Invalid', reveals: null };
+  }
+  const correct = compareNumeric(cardVal, comp, guessVal);
+  let hint = '';
+  if (correct) {
+    hint = `Loyalty is ${card.loyalty}`;
+  } else if (comp === '=') {
+    hint = `Not ${guessVal}`;
+  } else {
+    hint = getConstraintHint('Loyalty', cardVal, comp, guessVal);
+  }
+  return { correct, category: 'loyalty', hint, reveals: correct ? 'pt' : null };
+}
+
+
+function evaluateSet(query, card) {
+  const val = query.value.toLowerCase();
+  const cardSet = (card.set || '').toLowerCase();
+  const cardSetName = (card.set_name || '').toLowerCase();
+  const correct = val === cardSet || cardSetName.includes(val);
+  return {
+    correct,
+    category: 'set',
+    hint: correct ? capitalize(card.set_name || card.set) : `Not ${val}`,
+    reveals: null,
+  };
+}
+
+
+function evaluateFlavor(query, card) {
+  const val = query.value.toLowerCase().trim();
+  if (BLOCKED_ORACLE_WORDS.has(val)) {
+    return {
+      correct: false,
+      category: 'flavor',
+      hint: `"${query.value}" is too common`,
+      reveals: null,
+    };
+  }
+  const text = (card.flavor_text || '').toLowerCase();
+  if (!text) {
+    return { correct: false, category: 'flavor', hint: 'No flavor text', reveals: null };
+  }
+  const correct = matchWholeWord(text, val);
+  return {
+    correct,
+    category: 'flavor',
+    hint: correct ? `Flavor contains "${query.value}"` : `No "${query.value}" in flavor`,
+    reveals: null,
+  };
+}
+
+
+function evaluateProduces(query, card) {
+  const val = query.value.toLowerCase().trim();
+  const produced = (card.produced_mana || []).map(m => m.toLowerCase());
+
+  const colorCode = COLOR_MAP[val] || val.toUpperCase();
+  const correct = produced.includes(colorCode.toLowerCase());
+  const colorName = COLOR_NAMES[colorCode] || val;
+
+  return {
+    correct,
+    category: 'produces',
+    hint: correct ? `Produces ${colorName}` : `Doesn't produce ${colorName}`,
+    reveals: null,
   };
 }
 
