@@ -73,9 +73,13 @@ function parseQuery(input) {
   match = input.match(/^(?:tou|toughness)(>=|<=|!=|>|<|=|:)(.+)$/);
   if (match) return { type: 'toughness', comparator: match[1] === ':' ? '=' : match[1], value: match[2].trim(), negated };
 
-  // Rarity
+  // Rarity with comparator: r>=r, r<m, r=uncommon
+  match = input.match(/^(?:r|rarity)(>=|<=|!=|>|<|=)(.+)$/);
+  if (match) return { type: 'rarity', comparator: match[1], value: match[2].trim(), negated };
+
+  // Rarity with colon: r:rare, r:mythic
   match = input.match(/^(?:r|rarity):(.+)$/);
-  if (match) return { type: 'rarity', value: match[1].trim(), negated };
+  if (match) return { type: 'rarity', comparator: '=', value: match[1].trim(), negated };
 
   // Set
   match = input.match(/^(?:s|e|set|edition):(.+)$/);
@@ -512,14 +516,35 @@ function evaluateProduces(query, card) {
 }
 
 
+const RARITY_ORDER = { common: 0, uncommon: 1, rare: 2, mythic: 3 };
+
 function evaluateRarity(query, card) {
   const val = RARITY_MAP[query.value] || query.value;
-  const correct = card.rarity === val;
+  const comp = query.comparator || '=';
+  const cardRank = RARITY_ORDER[card.rarity];
+  const guessRank = RARITY_ORDER[val];
+
+  if (cardRank === undefined || guessRank === undefined) {
+    return { correct: false, category: 'rarity', hint: `Unknown rarity "${query.value}"`, reveals: null };
+  }
+
+  const correct = compareNumeric(cardRank, comp, guessRank);
+  let hint = '';
+  if (correct && comp === '=') {
+    hint = capitalize(card.rarity);
+  } else if (correct) {
+    hint = `Yes, rarity ${comp} ${val}`;
+  } else if (comp === '=') {
+    hint = `Not ${val}`;
+  } else {
+    hint = `Not ${comp} ${val}`;
+  }
+
   return {
     correct,
     category: 'rarity',
-    hint: correct ? capitalize(card.rarity) : `Not ${val}`,
-    reveals: correct ? 'rarity' : null,
+    hint,
+    reveals: (correct && comp === '=') ? 'rarity' : null,
   };
 }
 
