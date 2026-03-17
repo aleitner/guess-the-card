@@ -76,7 +76,7 @@
 
   // Ctrl+Shift+X to reset localStorage (debug)
   document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key === 'X') {
+    if (e.ctrlKey && e.shiftKey && e.key === 'Delete') {
       e.preventDefault();
       localStorage.clear();
       location.reload();
