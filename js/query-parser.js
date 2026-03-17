@@ -353,7 +353,7 @@ function evaluatePower(query, card) {
   }
   if (query.value === '*' || card.power === '*') {
     const correct = card.power === query.value;
-    return { correct, category: 'power', hint: correct ? 'Power is *' : 'Not *', reveals: correct ? 'pt' : null };
+    return { correct, category: 'power', hint: correct ? 'Power is *' : 'Not *', reveals: correct ? 'power' : null };
   }
   const cardVal = parseInt(card.power);
   const guessVal = parseInt(query.value);
@@ -373,7 +373,7 @@ function evaluatePower(query, card) {
     hint = getConstraintHint('Power', cardVal, comp, guessVal);
   }
   return {
-    correct, category: 'power', hint, reveals: (correct && comp === '=') ? 'pt' : null,
+    correct, category: 'power', hint, reveals: (correct && comp === '=') ? 'power' : null,
     constraint: correct ? null : { field: 'pow', comparator: comp, value: guessVal, cardValue: cardVal },
   };
 }
@@ -385,7 +385,7 @@ function evaluateToughness(query, card) {
   }
   if (query.value === '*' || card.toughness === '*') {
     const correct = card.toughness === query.value;
-    return { correct, category: 'toughness', hint: correct ? 'Toughness is *' : 'Not *', reveals: correct ? 'pt' : null };
+    return { correct, category: 'toughness', hint: correct ? 'Toughness is *' : 'Not *', reveals: correct ? 'toughness' : null };
   }
   const cardVal = parseInt(card.toughness);
   const guessVal = parseInt(query.value);
@@ -405,7 +405,7 @@ function evaluateToughness(query, card) {
     hint = getConstraintHint('Toughness', cardVal, comp, guessVal);
   }
   return {
-    correct, category: 'toughness', hint, reveals: (correct && comp === '=') ? 'pt' : null,
+    correct, category: 'toughness', hint, reveals: (correct && comp === '=') ? 'toughness' : null,
     constraint: correct ? null : { field: 'tou', comparator: comp, value: guessVal, cardValue: cardVal },
   };
 }
@@ -453,7 +453,7 @@ function evaluateLoyalty(query, card) {
   } else {
     hint = getConstraintHint('Loyalty', cardVal, comp, guessVal);
   }
-  return { correct, category: 'loyalty', hint, reveals: (correct && comp === '=') ? 'pt' : null };
+  return { correct, category: 'loyalty', hint, reveals: (correct && comp === '=') ? 'loyalty' : null };
 }
 
 

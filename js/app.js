@@ -404,6 +404,26 @@
           slotPt.classList.add('revealed');
         }
         break;
+      case 'power':
+        if (cardData.power !== undefined) {
+          const currentTou = state.revealed.includes('toughness') ? cardData.toughness : '?';
+          slotPt.textContent = `${cardData.power} / ${currentTou}`;
+          slotPt.classList.add('revealed');
+        }
+        break;
+      case 'toughness':
+        if (cardData.toughness !== undefined) {
+          const currentPow = state.revealed.includes('power') ? cardData.power : '?';
+          slotPt.textContent = `${currentPow} / ${cardData.toughness}`;
+          slotPt.classList.add('revealed');
+        }
+        break;
+      case 'loyalty':
+        if (cardData.loyalty) {
+          slotPt.textContent = `Loyalty: ${cardData.loyalty}`;
+          slotPt.classList.add('revealed');
+        }
+        break;
       case 'rarity':
         slotRarity.textContent = capitalize(cardData.rarity || 'N/A');
         slotRarity.classList.add('revealed');
