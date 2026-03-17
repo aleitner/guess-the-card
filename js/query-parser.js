@@ -191,8 +191,8 @@ function evaluateColor(query, card) {
     hint = correct ? colorName : `Not ${colorName}`;
   }
 
-  // Color guess reveals the card border color but NOT the mana cost symbols
-  return { correct, category: 'color', hint, reveals: correct ? 'color' : null };
+  // c: (includes) doesn't reveal border — only c= (exact) does
+  return { correct, category: 'color', hint, reveals: null };
 }
 
 
