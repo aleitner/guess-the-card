@@ -179,6 +179,17 @@
         }
         updateRedactedSlot('artist');
         break;
+      case 'is': {
+        // Map is: tags that correspond to type-line words
+        const typeLineTags = ['legendary', 'historic', 'equipment', 'aura', 'saga', 'vehicle', 'planeswalker', 'permanent', 'spell'];
+        if (typeLineTags.includes(value.toLowerCase())) {
+          if (!state.textMatches.type.includes(value.toLowerCase())) {
+            state.textMatches.type.push(value.toLowerCase());
+          }
+          updateRedactedSlot('type');
+        }
+        break;
+      }
     }
   }
 
