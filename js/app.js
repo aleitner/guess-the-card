@@ -74,6 +74,15 @@
     if (e.target === helpModal) helpModal.classList.remove('active');
   });
 
+  // Ctrl+Shift+X to reset localStorage (debug)
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'X') {
+      e.preventDefault();
+      localStorage.clear();
+      location.reload();
+    }
+  });
+
   winClose.addEventListener('click', () => winModal.classList.remove('active'));
   winModal.addEventListener('click', (e) => {
     if (e.target === winModal) winModal.classList.remove('active');
