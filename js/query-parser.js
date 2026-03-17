@@ -185,10 +185,22 @@ function evaluateColor(query, card) {
     correct = cardColors.length === 1;
     hint = correct ? 'Mono-colored' : 'Not mono-colored';
   } else {
-    const colorCode = COLOR_MAP[val] || val.toUpperCase();
-    correct = cardColors.includes(colorCode);
-    const colorName = COLOR_NAMES[colorCode] || val;
-    hint = correct ? colorName : `Not ${colorName}`;
+    // Try as a single color name first (e.g. "red", "blue")
+    const singleCode = COLOR_MAP[val];
+    if (singleCode) {
+      correct = cardColors.includes(singleCode);
+      const colorName = COLOR_NAMES[singleCode] || val;
+      hint = correct ? colorName : `Not ${colorName}`;
+    } else {
+      // Multi-color shorthand: "gb" -> check G and B are both included
+      // Strip braces for {g}{b} format
+      const cleaned = val.replace(/[{}]/g, '');
+      const codes = cleaned.split('').map(ch => COLOR_MAP[ch] || ch.toUpperCase());
+      const allPresent = codes.every(c => cardColors.includes(c));
+      const names = codes.map(c => COLOR_NAMES[c] || c).join('+');
+      correct = allPresent;
+      hint = correct ? `Has ${names}` : `Not ${names}`;
+    }
   }
 
   // c: (includes) doesn't reveal border — only c= (exact) does
