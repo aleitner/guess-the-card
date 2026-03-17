@@ -228,15 +228,17 @@ function evaluateColorCount(query, card) {
   const correct = compareNumeric(cardCount, comp, val);
 
   let hint = '';
-  if (correct) {
+  if (correct && comp === '=') {
     hint = `${cardCount} color${cardCount !== 1 ? 's' : ''}`;
+  } else if (correct) {
+    hint = `Yes, colors ${comp} ${val}`;
   } else if (comp === '=') {
     hint = `Not ${val} colors`;
   } else {
     hint = getConstraintHint('Colors', cardCount, comp, val);
   }
 
-  return { correct, category: 'color', hint, reveals: correct ? 'color' : null };
+  return { correct, category: 'color', hint, reveals: (correct && comp === '=') ? 'color' : null };
 }
 
 
@@ -314,19 +316,19 @@ function evaluateCmc(query, card) {
   const correct = compareNumeric(cardCmc, comp, val);
 
   let hint = '';
-  if (correct) {
+  if (correct && comp === '=') {
     hint = `MV is ${cardCmc}`;
+  } else if (correct) {
+    hint = `Yes, MV ${comp} ${val}`;
   } else if (comp === '=') {
-    // No directional hint for exact guesses
     hint = `Not ${val}`;
   } else {
-    // Only give direction when user explicitly used > or <
     hint = getConstraintHint('MV', cardCmc, comp, val);
   }
 
   return {
     correct, category: 'cmc', hint,
-    reveals: correct ? 'cmc' : null,
+    reveals: (correct && comp === '=') ? 'cmc' : null,
     // Pass constraint info for slot display
     constraint: correct ? null : { field: 'cmc', comparator: comp, value: val, cardValue: cardCmc },
   };
@@ -349,15 +351,17 @@ function evaluatePower(query, card) {
   const comp = query.comparator;
   const correct = compareNumeric(cardVal, comp, guessVal);
   let hint = '';
-  if (correct) {
+  if (correct && comp === '=') {
     hint = `Power is ${card.power}`;
+  } else if (correct) {
+    hint = `Yes, power ${comp} ${guessVal}`;
   } else if (comp === '=') {
     hint = `Not ${guessVal}`;
   } else {
     hint = getConstraintHint('Power', cardVal, comp, guessVal);
   }
   return {
-    correct, category: 'power', hint, reveals: correct ? 'pt' : null,
+    correct, category: 'power', hint, reveals: (correct && comp === '=') ? 'pt' : null,
     constraint: correct ? null : { field: 'pow', comparator: comp, value: guessVal, cardValue: cardVal },
   };
 }
@@ -379,15 +383,17 @@ function evaluateToughness(query, card) {
   const comp = query.comparator;
   const correct = compareNumeric(cardVal, comp, guessVal);
   let hint = '';
-  if (correct) {
+  if (correct && comp === '=') {
     hint = `Toughness is ${card.toughness}`;
+  } else if (correct) {
+    hint = `Yes, toughness ${comp} ${guessVal}`;
   } else if (comp === '=') {
     hint = `Not ${guessVal}`;
   } else {
     hint = getConstraintHint('Toughness', cardVal, comp, guessVal);
   }
   return {
-    correct, category: 'toughness', hint, reveals: correct ? 'pt' : null,
+    correct, category: 'toughness', hint, reveals: (correct && comp === '=') ? 'pt' : null,
     constraint: correct ? null : { field: 'tou', comparator: comp, value: guessVal, cardValue: cardVal },
   };
 }
@@ -426,14 +432,16 @@ function evaluateLoyalty(query, card) {
   }
   const correct = compareNumeric(cardVal, comp, guessVal);
   let hint = '';
-  if (correct) {
+  if (correct && comp === '=') {
     hint = `Loyalty is ${card.loyalty}`;
+  } else if (correct) {
+    hint = `Yes, loyalty ${comp} ${guessVal}`;
   } else if (comp === '=') {
     hint = `Not ${guessVal}`;
   } else {
     hint = getConstraintHint('Loyalty', cardVal, comp, guessVal);
   }
-  return { correct, category: 'loyalty', hint, reveals: correct ? 'pt' : null };
+  return { correct, category: 'loyalty', hint, reveals: (correct && comp === '=') ? 'pt' : null };
 }
 
 
