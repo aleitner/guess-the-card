@@ -515,14 +515,22 @@
   function updateCardBorderColor() {
     const colors = cardData.colors || [];
     const colorMap = { W: '#f9faf4', U: '#0e68ab', B: '#150b00', R: '#d3202a', G: '#00733e' };
+    const bgMap = { W: 'rgba(249,250,244,0.15)', U: 'rgba(14,104,171,0.15)', B: 'rgba(21,11,0,0.3)', R: 'rgba(211,32,42,0.15)', G: 'rgba(0,115,62,0.15)' };
 
+    let borderColor, bgColor;
     if (colors.length === 0) {
-      cardOutline.style.borderColor = '#aaa';
+      borderColor = '#aaa';
+      bgColor = 'rgba(170,170,170,0.08)';
     } else if (colors.length === 1) {
-      cardOutline.style.borderColor = colorMap[colors[0]] || '#777';
+      borderColor = colorMap[colors[0]] || '#777';
+      bgColor = bgMap[colors[0]] || 'rgba(119,119,119,0.08)';
     } else {
-      cardOutline.style.borderColor = '#c9a82a';
+      borderColor = '#c9a82a';
+      bgColor = 'rgba(201,168,42,0.1)';
     }
+
+    cardOutline.style.borderColor = borderColor;
+    cardOutline.style.background = bgColor;
   }
 
 
