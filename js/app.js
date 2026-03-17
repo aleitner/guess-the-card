@@ -42,8 +42,12 @@
     return;
   }
 
-  // Load or create game state
-  let state = loadGameState(today) || createFreshState();
+  // Load or create game state — validate card name matches to prevent stale state
+  let state = loadGameState(today);
+  if (!state || state.cardName !== cardName) {
+    state = createFreshState(cardName);
+    saveGameState(today, state);
+  }
   if (!state.constraints) state.constraints = { cmc: [], pow: [], tou: [] };
   if (!state.textMatches) state.textMatches = { oracle: [], type: [], artist: [], name: [] };
 

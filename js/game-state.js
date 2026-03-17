@@ -23,8 +23,9 @@ function saveGameState(date, state) {
   localStorage.setItem(key, JSON.stringify(state));
 }
 
-function createFreshState() {
+function createFreshState(cardName) {
   return {
+    cardName: cardName || '',
     guesses: [],
     revealed: [],
     solved: false,

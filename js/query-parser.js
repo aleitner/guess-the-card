@@ -81,8 +81,8 @@ function parseQuery(input) {
   match = input.match(/^(?:s|e|set|edition):(.+)$/);
   if (match) return { type: 'set', value: match[1].trim(), negated };
 
-  // Mana cost: m:{R}, m:R, m:{2}{R}, mana:{W}{U}
-  match = input.match(/^(?:m|mana):(.+)$/);
+  // Mana cost: m:{R}, m:R, m:{2}{R}, mana:{W}{U}, m=R, m={2}{R}
+  match = input.match(/^(?:m|mana)[:=](.+)$/);
   if (match) return { type: 'mana', value: match[1].trim(), negated };
 
   // Produces mana
