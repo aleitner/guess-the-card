@@ -57,21 +57,21 @@ function parseQuery(input) {
   match = input.match(/^(?:t|type):(.+)$/);
   if (match) return { type: 'type', value: match[1].trim(), negated };
 
-  // CMC / Mana Value
-  match = input.match(/^(?:cmc|mv)(>=|<=|!=|>|<|=)(\d+)$/);
-  if (match) return { type: 'cmc', comparator: match[1], value: parseInt(match[2]), negated };
+  // CMC / Mana Value (: treated as =)
+  match = input.match(/^(?:cmc|mv)(>=|<=|!=|>|<|=|:)(\d+)$/);
+  if (match) return { type: 'cmc', comparator: match[1] === ':' ? '=' : match[1], value: parseInt(match[2]), negated };
 
   // Loyalty
-  match = input.match(/^(?:loy|loyalty)(>=|<=|!=|>|<|=)(\d+)$/);
-  if (match) return { type: 'loyalty', comparator: match[1], value: parseInt(match[2]), negated };
+  match = input.match(/^(?:loy|loyalty)(>=|<=|!=|>|<|=|:)(\d+)$/);
+  if (match) return { type: 'loyalty', comparator: match[1] === ':' ? '=' : match[1], value: parseInt(match[2]), negated };
 
   // Power
-  match = input.match(/^(?:pow|power)(>=|<=|!=|>|<|=)(.+)$/);
-  if (match) return { type: 'power', comparator: match[1], value: match[2].trim(), negated };
+  match = input.match(/^(?:pow|power)(>=|<=|!=|>|<|=|:)(.+)$/);
+  if (match) return { type: 'power', comparator: match[1] === ':' ? '=' : match[1], value: match[2].trim(), negated };
 
   // Toughness
-  match = input.match(/^(?:tou|toughness)(>=|<=|!=|>|<|=)(.+)$/);
-  if (match) return { type: 'toughness', comparator: match[1], value: match[2].trim(), negated };
+  match = input.match(/^(?:tou|toughness)(>=|<=|!=|>|<|=|:)(.+)$/);
+  if (match) return { type: 'toughness', comparator: match[1] === ':' ? '=' : match[1], value: match[2].trim(), negated };
 
   // Rarity
   match = input.match(/^(?:r|rarity):(.+)$/);
