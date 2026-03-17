@@ -45,9 +45,15 @@ function parseQuery(input) {
   match = input.match(/^(?:c|color|colors)(>=|<=|!=|>|<|=)(\d+)$/);
   if (match) return { type: 'colorcount', comparator: match[1], value: parseInt(match[2]), negated };
 
-  // Exact color: c=r (only red), c=rg (exactly red+green)
-  match = input.match(/^(?:c|color|colors)=([a-z]+)$/);
-  if (match) return { type: 'colorexact', value: match[1].trim(), negated };
+  // Color with comparator (non-digit): c>=g, c<=r, c=rg, c!=bg
+  match = input.match(/^(?:c|color|colors)(>=|<=|!=|=)([a-z]+)$/);
+  if (match) {
+    const comp = match[1];
+    if (comp === '=') {
+      return { type: 'colorexact', value: match[2].trim(), negated };
+    }
+    return { type: 'colorcomp', comparator: comp, value: match[2].trim(), negated };
+  }
 
   // Color includes: c:red, c:r (has red, possibly more)
   match = input.match(/^(?:c|color|colors):(.+)$/);
@@ -130,6 +136,7 @@ function evaluateGuess(query, card) {
     case 'name': return evaluateName(query, card);
     case 'color': result = evaluateColor(query, card); break;
     case 'colorexact': result = evaluateColorExact(query, card); break;
+    case 'colorcomp': result = evaluateColorComp(query, card); break;
     case 'colorcount': result = evaluateColorCount(query, card); break;
     case 'identity': result = evaluateIdentity(query, card); break;
     case 'type': result = evaluateType(query, card); break;
@@ -234,6 +241,49 @@ function evaluateColorExact(query, card) {
   const hint = correct ? `Exactly ${targetName}` : `Not exactly ${targetName}`;
 
   return { correct, category: 'color', hint, reveals: correct ? 'color' : null };
+}
+
+
+// WUBRG ordering for color comparators
+const COLOR_ORDER = { W: 0, U: 1, B: 2, R: 3, G: 4 };
+
+function evaluateColorComp(query, card) {
+  const val = query.value.toLowerCase().trim();
+  const cardColors = (card.colors || []);
+  const comp = query.comparator;
+
+  // Parse target colors from input
+  const targetColors = val.split('').map(ch => COLOR_MAP[ch] || ch.toUpperCase());
+
+  // For >=, check that card colors are a superset of target
+  // For <=, check that card colors are a subset of target
+  // For >, !=, < — compare similarly
+  const cardSet = new Set(cardColors);
+  const targetSet = new Set(targetColors);
+
+  let correct = false;
+  if (comp === '>=') {
+    // Card has at least all the target colors
+    correct = targetColors.every(c => cardSet.has(c));
+  } else if (comp === '<=') {
+    // Card colors are all within target colors
+    correct = cardColors.every(c => targetSet.has(c));
+  } else if (comp === '!=') {
+    const cardSorted = [...cardColors].sort();
+    const targetSorted = [...targetColors].sort();
+    correct = JSON.stringify(cardSorted) !== JSON.stringify(targetSorted);
+  }
+
+  const targetName = targetColors.map(c => COLOR_NAMES[c] || c).join('+');
+  const hints = {
+    '>=': [`Includes ${targetName}`, `Doesn't include all of ${targetName}`],
+    '<=': [`At most ${targetName}`, `Has colors beyond ${targetName}`],
+    '!=': [`Not exactly ${targetName}`, `Is exactly ${targetName}`],
+  };
+  const [yes, no] = hints[comp] || [`Yes`, `No`];
+  const hint = correct ? yes : no;
+
+  return { correct, category: 'color', hint, reveals: null };
 }
 
 
