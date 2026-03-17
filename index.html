@@ -51,13 +51,16 @@
 
     <div class="input-area" id="input-area">
       <form id="guess-form">
-        <input
-          type="text"
-          id="guess-input"
-          placeholder='e.g. c:red, t:creature, cmc=3, pow>2, o:flying'
-          autocomplete="off"
-          spellcheck="false"
-        >
+        <div class="input-wrapper">
+          <input
+            type="text"
+            id="guess-input"
+            placeholder='e.g. c:red, t:creature, cmc=3, pow>2, o:flying'
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <div class="autocomplete-list" id="autocomplete-list"></div>
+        </div>
         <button type="submit">Guess</button>
       </form>
       <div class="input-hint" id="input-hint"></div>

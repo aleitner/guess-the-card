@@ -80,6 +80,83 @@
   });
   shareBtn.addEventListener('click', shareResults);
 
+  // Autocomplete for card names
+  const autocompleteList = document.getElementById('autocomplete-list');
+  const cardNames = UNIQUE_CARD_POOL.map(c => c.name).sort();
+  let acSelectedIndex = -1;
+
+  guessInput.addEventListener('input', () => {
+    const raw = guessInput.value.trim().toLowerCase();
+    acSelectedIndex = -1;
+
+    // Extract name portion: bare text or after "name:"
+    let nameQuery = '';
+    if (raw.startsWith('name:')) {
+      nameQuery = raw.slice(5).trim();
+    } else if (!raw.includes(':') && !raw.includes('=') && !raw.includes('>') && !raw.includes('<')) {
+      nameQuery = raw;
+    }
+
+    if (nameQuery.length < 2) {
+      autocompleteList.classList.remove('active');
+      autocompleteList.innerHTML = '';
+      return;
+    }
+
+    const matches = cardNames.filter(n => n.toLowerCase().includes(nameQuery)).slice(0, 8);
+    if (matches.length === 0) {
+      autocompleteList.classList.remove('active');
+      autocompleteList.innerHTML = '';
+      return;
+    }
+
+    autocompleteList.innerHTML = matches.map((name, i) =>
+      `<div class="autocomplete-item" data-index="${i}">${name}</div>`
+    ).join('');
+    autocompleteList.classList.add('active');
+
+    autocompleteList.querySelectorAll('.autocomplete-item').forEach(item => {
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        guessInput.value = item.textContent;
+        autocompleteList.classList.remove('active');
+        autocompleteList.innerHTML = '';
+      });
+    });
+  });
+
+  guessInput.addEventListener('keydown', (e) => {
+    const items = autocompleteList.querySelectorAll('.autocomplete-item');
+    if (!items.length || !autocompleteList.classList.contains('active')) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      acSelectedIndex = Math.min(acSelectedIndex + 1, items.length - 1);
+      items.forEach((el, i) => el.classList.toggle('selected', i === acSelectedIndex));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      acSelectedIndex = Math.max(acSelectedIndex - 1, 0);
+      items.forEach((el, i) => el.classList.toggle('selected', i === acSelectedIndex));
+    } else if (e.key === 'Tab' || (e.key === 'Enter' && acSelectedIndex >= 0)) {
+      e.preventDefault();
+      guessInput.value = items[acSelectedIndex].textContent;
+      autocompleteList.classList.remove('active');
+      autocompleteList.innerHTML = '';
+      if (e.key === 'Enter') {
+        // Don't submit yet — let them confirm
+        acSelectedIndex = -1;
+      }
+    } else if (e.key === 'Escape') {
+      autocompleteList.classList.remove('active');
+    }
+  });
+
+  guessInput.addEventListener('blur', () => {
+    setTimeout(() => {
+      autocompleteList.classList.remove('active');
+    }, 150);
+  });
+
   // Form submission
   guessForm.addEventListener('submit', (e) => {
     e.preventDefault();
