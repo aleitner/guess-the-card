@@ -26,16 +26,33 @@ function getShuffledOrder(poolLength, seed) {
   return indices;
 }
 
+// Each era locks in a pool size so adding cards doesn't change past days.
+// When the pool grows, add a new era starting from the next available day.
+const CARD_ERAS = [
+  { startDay: 0, poolSize: 593, seed: 0x70BBE1 },
+  // To add cards: append new entries with new cards at the END of UNIQUE_CARD_POOL
+  // { startDay: 593, poolSize: 650, seed: 0x70BBE2 },
+];
+
 function getDailyCardName() {
   const now = new Date();
   const todayUTC = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
   const daysDiff = Math.floor((todayUTC.getTime() - EPOCH.getTime()) / 86400000);
-  const pool = UNIQUE_CARD_POOL;
-  // Use a different seed each cycle so the order changes after exhausting the pool
-  const cycle = Math.floor(daysDiff / pool.length);
-  const dayInCycle = daysDiff % pool.length;
-  const shuffled = getShuffledOrder(pool.length, 0x70BBE1 + cycle);
-  return pool[shuffled[dayInCycle]].name;
+
+  // Find which era this day falls into
+  let era = CARD_ERAS[0];
+  for (let i = CARD_ERAS.length - 1; i >= 0; i--) {
+    if (daysDiff >= CARD_ERAS[i].startDay) {
+      era = CARD_ERAS[i];
+      break;
+    }
+  }
+
+  const dayInEra = daysDiff - era.startDay;
+  const cycle = Math.floor(dayInEra / era.poolSize);
+  const dayInCycle = dayInEra % era.poolSize;
+  const shuffled = getShuffledOrder(era.poolSize, era.seed + cycle);
+  return UNIQUE_CARD_POOL[shuffled[dayInCycle]].name;
 }
 
 function getTodayDateString() {
