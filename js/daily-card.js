@@ -9,9 +9,13 @@ function getDailyIndex() {
   const now = new Date();
   const todayUTC = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
   const daysDiff = Math.floor((todayUTC.getTime() - EPOCH.getTime()) / 86400000);
-  // Shuffle using a simple hash so consecutive days don't pick consecutive cards
+  // Better hash to avoid collisions on consecutive days
   const pool = UNIQUE_CARD_POOL;
-  return ((daysDiff * 2654435761) >>> 0) % pool.length;
+  let h = daysDiff;
+  h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+  h = ((h >>> 16) ^ h) * 0x45d9f3b | 0;
+  h = (h >>> 16) ^ h;
+  return ((h >>> 0) % pool.length);
 }
 
 function getDailyCardName() {
