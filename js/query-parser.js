@@ -700,6 +700,9 @@ function evaluateIs(query, card) {
     saga: () => typeLine.includes('saga'),
     vehicle: () => typeLine.includes('vehicle'),
     planeswalker: () => typeLine.includes('planeswalker'),
+    commander: () => (typeLine.includes('legendary') && typeLine.includes('creature')) ||
+      text.includes('can be your commander') ||
+      (typeLine.includes('legendary') && text.includes('creature in addition to its other types')),
     permanent: () => /\b(creature|artifact|enchantment|planeswalker|land|battle)\b/.test(typeLine) && !typeLine.includes('instant') && !typeLine.includes('sorcery'),
     spell: () => typeLine.includes('instant') || typeLine.includes('sorcery'),
     flash: () => keywords.includes('flash'),
