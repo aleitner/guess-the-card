@@ -408,7 +408,9 @@ function evaluateCmc(query, card) {
 
 function evaluatePower(query, card) {
   if (card.power === undefined || card.power === null) {
-    return { correct: false, category: 'power', hint: `Not ${query.value}`, reveals: null };
+    const comp = query.comparator;
+    const hint = comp === '=' ? `Not ${query.value}` : `Not ${comp} ${query.value}`;
+    return { correct: false, category: 'power', hint, reveals: null };
   }
   if (query.value === '*' || card.power === '*') {
     const correct = card.power === query.value;
@@ -440,7 +442,9 @@ function evaluatePower(query, card) {
 
 function evaluateToughness(query, card) {
   if (card.toughness === undefined || card.toughness === null) {
-    return { correct: false, category: 'toughness', hint: `Not ${query.value}`, reveals: null };
+    const comp = query.comparator;
+    const hint = comp === '=' ? `Not ${query.value}` : `Not ${comp} ${query.value}`;
+    return { correct: false, category: 'toughness', hint, reveals: null };
   }
   if (query.value === '*' || card.toughness === '*') {
     const correct = card.toughness === query.value;
