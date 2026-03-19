@@ -91,6 +91,10 @@ function parseQuery(input) {
   match = input.match(/^(?:s|e|set|edition):(.+)$/);
   if (match) return { type: 'set', value: match[1].trim(), negated };
 
+  // Year / Date
+  match = input.match(/^(?:year|date)(>=|<=|!=|>|<|=|:)(\d{4})$/);
+  if (match) return { type: 'year', comparator: match[1] === ':' ? '=' : match[1], value: parseInt(match[2]), negated };
+
   // Mana cost: m:{R}, m:R, m:{2}{R}, mana:{W}{U}, m=R, m={2}{R}
   match = input.match(/^(?:m|mana)[:=](.+)$/);
   if (match) return { type: 'mana', value: match[1].trim(), negated };
@@ -147,6 +151,7 @@ function evaluateGuess(query, card) {
     case 'toughness': result = evaluateToughness(query, card); break;
     case 'rarity': result = evaluateRarity(query, card); break;
     case 'set': result = evaluateSet(query, card); break;
+    case 'year': result = evaluateYear(query, card); break;
     case 'oracle': result = evaluateOracle(query, card); break;
     case 'flavor': result = evaluateFlavor(query, card); break;
     case 'produces': result = evaluateProduces(query, card); break;
@@ -522,6 +527,29 @@ function evaluateSet(query, card) {
     hint: correct ? capitalize(card.set_name || card.set) : `Not ${val}`,
     reveals: null,
   };
+}
+
+
+function evaluateYear(query, card) {
+  const releaseDate = card.released_at || '';
+  const cardYear = parseInt(releaseDate.slice(0, 4));
+  if (isNaN(cardYear)) {
+    return { correct: false, category: 'year', hint: 'Unknown release date', reveals: null };
+  }
+  const comp = query.comparator;
+  const val = query.value;
+  const correct = compareNumeric(cardYear, comp, val);
+  let hint = '';
+  if (correct && comp === '=') {
+    hint = `Released in ${cardYear}`;
+  } else if (correct) {
+    hint = `Yes, year ${comp} ${val}`;
+  } else if (comp === '=') {
+    hint = `Not ${val}`;
+  } else {
+    hint = getConstraintHint('Year', cardYear, comp, val);
+  }
+  return { correct, category: 'year', hint, reveals: null };
 }
 
 
