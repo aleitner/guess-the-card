@@ -407,7 +407,7 @@ function evaluateCmc(query, card) {
 
 
 function evaluatePower(query, card) {
-  if (!card.power) {
+  if (card.power === undefined || card.power === null) {
     return { correct: false, category: 'power', hint: `Not ${query.value}`, reveals: null };
   }
   if (query.value === '*' || card.power === '*') {
@@ -439,7 +439,7 @@ function evaluatePower(query, card) {
 
 
 function evaluateToughness(query, card) {
-  if (!card.toughness) {
+  if (card.toughness === undefined || card.toughness === null) {
     return { correct: false, category: 'toughness', hint: `Not ${query.value}`, reveals: null };
   }
   if (query.value === '*' || card.toughness === '*') {
